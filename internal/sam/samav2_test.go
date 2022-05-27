@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dumacp/smartcard"
 	"github.com/dumacp/smartcard/nxp/mifare/samav2"
 	"github.com/dumacp/smartcard/pcsc"
 )
@@ -72,6 +73,44 @@ func Test_enableKeys(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("enableKeys() = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_samAv2_Decrypt(t *testing.T) {
+	type fields struct {
+		dev  samav2.SamAv2
+		card smartcard.ICard
+	}
+	type args struct {
+		data     []byte
+		iv       []byte
+		divInput []byte
+		slot     int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &samAv2{
+				dev:  tt.fields.dev,
+				card: tt.fields.card,
+			}
+			got, err := s.Decrypt(tt.args.data, tt.args.iv, tt.args.divInput, tt.args.slot)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("samAv2.Decrypt() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("samAv2.Decrypt() = %v, want %v", got, tt.want)
 			}
 		})
 	}

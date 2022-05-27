@@ -92,10 +92,12 @@ func (s *samAv2) Connect() error {
 	// logs.LogBuild.Printf("sam ATR: %X", atr)
 	// logs.LogBuild.Printf("sam ATR (ascii): %s", atr)
 
-	keyMaster := make([]byte, 16)
-	if _, err := card.AuthHostAV2(keyMaster, 0, 0, 0); err != nil {
-		return err
-	}
+	// TODO ???????????? AUTH
+	// keyMaster := make([]byte, 16)
+
+	// if _, err := card.AuthHostAV2(keyMaster, 0, 0, 0); err != nil {
+	// 	return err
+	// }
 
 	s.dev = card
 	var err error

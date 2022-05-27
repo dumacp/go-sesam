@@ -131,7 +131,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 		}(); err != nil {
 			logs.LogError.Println(err)
 			if ctx.Sender() != nil {
-				time.Sleep(3 * time.Second)
+				// time.Sleep(3 * time.Second)
 				ctx.Respond(&messages.MsgAck{Error: err.Error()})
 			}
 			a.fm.Event(eError, err)
@@ -153,7 +153,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 		}(); err != nil {
 			logs.LogError.Println(err)
 			if ctx.Sender() != nil {
-				time.Sleep(3 * time.Second)
+				// time.Sleep(3 * time.Second)
 				ctx.Respond(&messages.MsgAck{Error: err.Error()})
 			}
 			a.fm.Event(eError, err)
@@ -175,7 +175,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 		}(); err != nil {
 			logs.LogError.Println(err)
 			if ctx.Sender() != nil {
-				time.Sleep(3 * time.Second)
+				// time.Sleep(3 * time.Second)
 				ctx.Respond(&messages.MsgAck{Error: err.Error()})
 			}
 			a.fm.Event(eError, err)
