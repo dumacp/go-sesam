@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"time"
 
-	"github.com/AsynkronIT/protoactor-go/actor"
+	"github.com/asynkron/protoactor-go/actor"
 	"github.com/dumacp/go-logs/pkg/logs"
 	"github.com/dumacp/go-sesam/internal/sam"
 	"github.com/dumacp/go-sesam/pkg/messages"
