@@ -24,6 +24,7 @@ type samActor struct {
 	sam      se.SE
 	ctx      actor.Context
 	contxt   context.Context
+	cancel   func()
 }
 
 // type Actor interface {
@@ -75,8 +76,15 @@ func (a *samActor) CloseState(ctx actor.Context) {
 	logs.LogBuild.Printf("Message arrived in samActor, behavior (CloseState): %s, %T. %s", ctx.Message(), ctx.Message(), ctx.Sender())
 	switch ctx.Message().(type) {
 	case *actor.Started:
+		contxt, cancel := context.WithCancel(context.Background())
+		a.contxt = contxt
+		a.cancel = cancel
 		a.initFSM()
 		ctx.Send(ctx.Self(), &messages.MsgOpen{})
+	case *actor.Stopping:
+		if a.cancel != nil {
+			a.cancel()
+		}
 	case *messages.MsgOpen:
 		if err := func() error {
 			c, err := sam.NewSamAV2(a.card)
@@ -108,6 +116,10 @@ func (a *samActor) WaitState(ctx actor.Context) {
 	logs.LogBuild.Printf("Message arrived in samActor (%s), behavior (WaitState): %+v, %T, %s",
 		ctx.Self().GetId(), ctx.Message(), ctx.Message(), ctx.Sender())
 	switch msg := ctx.Message().(type) {
+	case *actor.Stopping:
+		if a.cancel != nil {
+			a.cancel()
+		}
 	case *messages.MsgClose:
 		if err := func() error {
 			if err := a.sam.Disconnect(); err != nil {
