@@ -1,6 +1,7 @@
 package se
 
 import (
+	"context"
 	"encoding/hex"
 	"time"
 
@@ -22,6 +23,7 @@ type samActor struct {
 	uid      string
 	sam      se.SE
 	ctx      actor.Context
+	contxt   context.Context
 }
 
 // type Actor interface {
@@ -91,13 +93,13 @@ func (a *samActor) CloseState(ctx actor.Context) {
 				return err
 			}
 			a.sam = c
-			a.fm.Event(eOpenCmd)
+			a.fm.Event(a.contxt, eOpenCmd)
 			logs.LogInfo.Printf("sam UID: [% X]", c.Serial())
 			a.uid = hex.EncodeToString(c.Serial())
 			return nil
 		}(); err != nil {
 			logs.LogError.Printf("sam err: %s", err)
-			a.fm.Event(eError, err)
+			a.fm.Event(a.contxt, eError, err)
 		}
 	}
 }
@@ -111,7 +113,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 			if err := a.sam.Disconnect(); err != nil {
 				return err
 			}
-			a.fm.Event(eClosed)
+			a.fm.Event(a.contxt, eClosed)
 			return nil
 		}(); err != nil {
 			logs.LogError.Println(err)
@@ -134,7 +136,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 				// time.Sleep(3 * time.Second)
 				ctx.Respond(&messages.MsgAck{Error: err.Error()})
 			}
-			a.fm.Event(eError, err)
+			a.fm.Event(a.contxt, eError, err)
 		}
 	case *messages.MsgEncryptRequest:
 		if err := func() error {
@@ -156,7 +158,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 				// time.Sleep(3 * time.Second)
 				ctx.Respond(&messages.MsgAck{Error: err.Error()})
 			}
-			a.fm.Event(eError, err)
+			a.fm.Event(a.contxt, eError, err)
 		}
 	case *messages.MsgDecryptRequest:
 		if err := func() error {
@@ -178,7 +180,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 				// time.Sleep(3 * time.Second)
 				ctx.Respond(&messages.MsgAck{Error: err.Error()})
 			}
-			a.fm.Event(eError, err)
+			a.fm.Event(a.contxt, eError, err)
 		}
 	case *messages.MsgDumpSecretKeyRequest:
 		if err := func() error {
@@ -198,7 +200,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 				time.Sleep(3 * time.Second)
 				ctx.Respond(&messages.MsgAck{Error: err.Error()})
 			}
-			a.fm.Event(eError, err)
+			a.fm.Event(a.contxt, eError, err)
 		}
 	case *messages.MsgCreateKeyRequest:
 		if err := func() error {
@@ -216,7 +218,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 			// 	time.Sleep(3 * time.Second)
 			// 	ctx.Respond(&MsgAck{Error: err.Error()})
 			// }
-			a.fm.Event(eError, err)
+			a.fm.Event(a.contxt, eError, err)
 		}
 	case *messages.MsgImportKeyRequest:
 		if err := func() error {
@@ -235,7 +237,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 			// 	time.Sleep(3 * time.Second)
 			// 	ctx.Respond(&MsgAck{Error: err.Error()})
 			// }
-			a.fm.Event(eError, err)
+			a.fm.Event(a.contxt, eError, err)
 		}
 		// case *messages.MsgEnableKeysRequest:
 		// 	if err := func() error {
@@ -254,7 +256,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 		// 		// 	time.Sleep(3 * time.Second)
 		// 		// 	ctx.Respond(&MsgAck{Error: err.Error()})
 		// 		// }
-		// 		a.fm.Event(eError, err)
+		// 		a.fm.Event(a.contxt, eError, err)
 		// 	}
 	}
 }

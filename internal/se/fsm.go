@@ -1,6 +1,7 @@
 package se
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -38,28 +39,28 @@ func enterState(state string) string {
 func (a *samActor) initFSM() {
 
 	calls := fsm.Callbacks{
-		"enter_state": func(e *fsm.Event) {
+		"enter_state": func(ctx context.Context, e *fsm.Event) {
 			logs.LogBuild.Printf("FSM SAM state Src: %v, state Dst: %v", e.Src, e.Dst)
 		},
-		"leave_state": func(e *fsm.Event) {
+		"leave_state": func(ctx context.Context, e *fsm.Event) {
 			if e.Err != nil {
 				e.Cancel(e.Err)
 			}
 		},
-		"before_event": func(e *fsm.Event) {
+		"before_event": func(ctx context.Context, e *fsm.Event) {
 			if e.Err != nil {
 				e.Cancel(e.Err)
 			}
 		},
-		enterState(sOpen): func(e *fsm.Event) {
+		enterState(sOpen): func(ctx context.Context, e *fsm.Event) {
 			a.behavior.Become(a.WaitState)
-			go a.fm.Event(eOpened)
+			go a.fm.Event(a.contxt, eOpened)
 		},
-		enterState(sClose): func(e *fsm.Event) {
+		enterState(sClose): func(ctx context.Context, e *fsm.Event) {
 			a.behavior.Become(a.CloseState)
 			// a.ctx.Request(a.db.PID(), &database.MsgCloseDB{})
 		},
-		enterState(sRestart): func(e *fsm.Event) {
+		enterState(sRestart): func(ctx context.Context, e *fsm.Event) {
 			time.Sleep(10 * time.Second)
 			a.behavior.Become(a.CloseState)
 			a.ctx.Send(a.ctx.Self(), &messages.MsgOpen{})
