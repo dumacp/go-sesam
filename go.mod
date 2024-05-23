@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/asynkron/protoactor-go v0.0.0-20221002142108-880b460fcd1f
 	github.com/dumacp/go-logs v0.0.0-20220527154118-cf272998dc98
-	github.com/dumacp/smartcard v0.0.0-20220526174801-30da611bb578
+	github.com/dumacp/smartcard v0.0.0-00010101000000-000000000000
 	github.com/looplab/fsm v1.0.1
 )
 
@@ -14,7 +14,7 @@ require (
 	github.com/aead/cmac v0.0.0-20160719120800-7af84192f0b1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/ebfe/scard v0.0.0-20190212122703-c3d1b1916a95 // indirect
+	github.com/ebfe/scard v0.0.0-20230420082256-7db3f9b7c8a7 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -38,3 +38,5 @@ require (
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 )
+
+replace github.com/dumacp/smartcard => ../smartcard
