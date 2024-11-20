@@ -140,7 +140,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 			if err != nil {
 				return fmt.Errorf("auth sam error: %w", err)
 			}
-			if _, err := a.sam.Auth(keyAuth, msg.Slot, msg.Version, 0); err != nil {
+			if _, err := a.sam.Auth(keyAuth, msg.Slot, msg.Version); err != nil {
 				return fmt.Errorf("auth sam error: %w", err)
 			}
 			return nil
