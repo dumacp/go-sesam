@@ -73,3 +73,8 @@ type MsgEnableKeysRequest struct{}
 type MsgEnableKeysResponse struct {
 	Data []int
 }
+type MsgAuth struct {
+	Key     string
+	Version int
+	Slot    int
+}

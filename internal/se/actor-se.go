@@ -3,6 +3,7 @@ package se
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 	"time"
 
 	"github.com/asynkron/protoactor-go/actor"
@@ -129,6 +130,26 @@ func (a *samActor) WaitState(ctx actor.Context) {
 			return nil
 		}(); err != nil {
 			logs.LogError.Println(err)
+		}
+	case *messages.MsgAuth:
+		if err := func() error {
+			if len(msg.Key) <= 0 {
+				return fmt.Errorf("auth sam error: len key is %d", len(msg.Key))
+			}
+			keyAuth, err := hex.DecodeString(msg.Key)
+			if err != nil {
+				return fmt.Errorf("auth sam error: %w", err)
+			}
+			if _, err := sam.AuthHostAV2(keyAuth, msg.Slot, msg.Version, 0); err != nil {
+				return fmt.Errorf("auth sam error: %w", err)
+			}
+			return nil
+		}; err != nil {
+			if ctx.Sender != nil {
+				ctx.Respond(&messages.MsgAck{
+					Error: err.Error(),
+				})
+			}
 		}
 	case *messages.MsgApdu:
 		if err := func() error {
