@@ -9,7 +9,7 @@ import (
 	"github.com/dumacp/go-sesam/pkg/se"
 	"github.com/dumacp/smartcard"
 	"github.com/dumacp/smartcard/nxp/mifare"
-	"github.com/dumacp/smartcard/nxp/mifare/samav2"
+	"github.com/dumacp/smartcard/nxp/mifare/samav3"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 // )
 
 type samAv2 struct {
-	dev  samav2.SamAv2
+	dev  samav3.SamAv3
 	card smartcard.ICard
 	// enableKeys map[int]int
 	// verifyKeys bool
@@ -62,14 +62,14 @@ func (s *samAv2) Serial() []byte {
 	return uid
 }
 
-func enableKeys(s samav2.SamAv2) (map[int]int, error) {
+func enableKeys(s samav3.SamAv2) (map[int]int, error) {
 	keys := make(map[int]int)
 	for keyNumber := range make([]int, 128) {
 		resp, err := s.SAMGetKeyEntry(keyNumber)
 		if err != nil {
 			return keys, err
 		}
-		keyData := samav2.NewEntryKeyData(resp, samav2.AES_128)
+		keyData := samav3.NewEntryKeyData(resp, samav3.AES_128)
 		// log.Printf("keyData %d: %+v, [%X]", keyNumber, keyData, resp)
 		//TODO: why is key to enable?
 		if int(keyData.Vc) == int(2) {
@@ -85,7 +85,7 @@ func (s *samAv2) Connect() error {
 	// if err != nil {
 	// 	return err
 	// }
-	card := samav2.SamAV2(s.card)
+	card := samav3.SamAV3(s.card)
 	// uid, _ := card.UID()
 	// logs.LogBuild.Printf("sam UID: [% X]", uid)
 	// atr, _ := card.ATR()
@@ -122,15 +122,15 @@ func (s *samAv2) GenerateKey(slot int, alg string) error {
 		if _, err := rand.Read(key); err != nil {
 			return err
 		}
-		setConfig := samav2.SETConfigurationSettings(
-			false, false, samav2.AES_128,
+		setConfig := samav3.SETConfigurationSettings(
+			false, false, samav3.AES_128,
 			false, false, false, false,
 			false, false, false, false)
-		extSetConfig := samav2.ExtSETConfigurationSettings(
-			// samav2.OfflineCrypto_KEY|samav2.PICC_KEY|samav2.OfflineChange_KEY,
-			samav2.OfflineCrypto_KEY,
+		extSetConfig := samav3.ExtSETConfigurationSettings(
+			// samav3.OfflineCrypto_KEY|samav3.PICC_KEY|samav3.OfflineChange_KEY,
+			samav3.OfflineCrypto_KEY,
 			true, false)
-		// logs.LogBuild.Printf("extSet: [% X], %X", extSetConfig, samav2.OfflineCrypto_KEY|samav2.PICC_KEY|samav2.OfflineChange_KEY)
+		// logs.LogBuild.Printf("extSet: [% X], %X", extSetConfig, samav3.OfflineCrypto_KEY|samav3.PICC_KEY|samav3.OfflineChange_KEY)
 		resp, err := s.dev.ChangeKeyEntry(slot, 0xFF,
 			key[0:16], key[16:32], key[32:48],
 			0x00,
@@ -173,13 +173,13 @@ func (s *samAv2) ImportKey(key []byte, slot int, alg string) error {
 		if len(keyCopy) != 3*16 {
 			return errors.New("key len is invalid")
 		}
-		setConfig := samav2.SETConfigurationSettings(
-			false, false, samav2.AES_128,
+		setConfig := samav3.SETConfigurationSettings(
+			false, false, samav3.AES_128,
 			false, false, false, false,
 			false, false, false, false)
-		extSetConfig := samav2.ExtSETConfigurationSettings(
-			// samav2.OfflineCrypto_KEY|samav2.PICC_KEY|samav2.OfflineChange_KEY,
-			samav2.OfflineCrypto_KEY,
+		extSetConfig := samav3.ExtSETConfigurationSettings(
+			// samav3.OfflineCrypto_KEY|samav3.PICC_KEY|samav3.OfflineChange_KEY,
+			samav3.OfflineCrypto_KEY,
 			true, false)
 		resp, err := s.dev.ChangeKeyEntry(slot, 0xFF,
 			keyCopy[0:16], keyCopy[16:32], keyCopy[32:48],
@@ -210,11 +210,11 @@ func (s *samAv2) Decrypt(data, iv, divInput []byte, slot int) ([]byte, error) {
 	// 	s.keyCrypto = slot
 	// }
 
-	if _, err := s.dev.SAMLoadInitVector(samav2.AES_ALG, iv); err != nil {
+	if _, err := s.dev.SAMLoadInitVector(samav3.AES_ALG, iv); err != nil {
 		return nil, err
 	}
 
-	resp, err := s.dev.SAMDecipherOfflineData(samav2.AES_ALG, data)
+	resp, err := s.dev.SAMDecipherOfflineData(samav3.AES_ALG, data)
 	if err != nil {
 		// logs.LogBuild.Printf("decipher err: %s, %X", err, data)
 		return nil, err
@@ -236,11 +236,11 @@ func (s *samAv2) Encrypt(data, iv, divInput []byte, slot int) ([]byte, error) {
 	// 	s.keyCrypto = slot
 	// }
 
-	if _, err := s.dev.SAMLoadInitVector(samav2.AES_ALG, iv); err != nil {
+	if _, err := s.dev.SAMLoadInitVector(samav3.AES_ALG, iv); err != nil {
 		return nil, err
 	}
 
-	resp, err := s.dev.SAMEncipherOfflineData(samav2.AES_ALG, data)
+	resp, err := s.dev.SAMEncipherOfflineData(samav3.AES_ALG, data)
 	if err != nil {
 		return nil, err
 	}
@@ -269,12 +269,12 @@ func (s *samAv2) CreateEntryKey(alg string, slot, keyChangeID int, keys []byte) 
 
 		keys = append(keys, make([]byte, len(keys)%48)...)
 
-		setConfig := samav2.SETConfigurationSettings(
-			true, true, samav2.AES_128,
+		setConfig := samav3.SETConfigurationSettings(
+			true, true, samav3.AES_128,
 			false, false, false, false,
 			false, false, false, false)
-		extSetConfig := samav2.ExtSETConfigurationSettings(
-			samav2.OfflineCrypto_KEY|samav2.PICC_KEY|samav2.OfflineChange_KEY,
+		extSetConfig := samav3.ExtSETConfigurationSettings(
+			samav3.OfflineCrypto_KEY|samav3.PICC_KEY|samav3.OfflineChange_KEY,
 			true, false)
 		resp, err := s.dev.ChangeKeyEntry(slot, 0x00,
 			keys[0:16], keys[16:32], keys[32:48],
