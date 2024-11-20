@@ -112,8 +112,12 @@ func (s *samAv2) Auth(key []byte, slot, version int) error {
 	if s.dev == nil {
 		return fmt.Errorf("device sam is nil")
 	}
-	if _, err := s.dev.AuthHostAV2(key, slot, version, 0); err != nil {
+	resp, err := s.dev.AuthHostAV2(key, slot, version, 0)
+	if err != nil {
 		return fmt.Errorf("sam auth error: %s", err)
+	}
+	if err := mifare.VerifyResponseIso7816(resp); err != nil {
+		return err
 	}
 	return nil
 }
