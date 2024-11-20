@@ -13,6 +13,7 @@ type SE interface {
 	DumpSecretKey(slot int) ([]byte, error)
 	// EnableKeys() ([]int, error)
 	Apdu(data []byte) ([]byte, error)
+	Auth(key []byte, slot, version int) error
 }
 
 var ErrKeyNotEnable = errors.New("key not enable")
