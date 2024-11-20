@@ -144,7 +144,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 				return fmt.Errorf("auth sam error: %w", err)
 			}
 			return nil
-		}; err != nil {
+		}(); err != nil {
 			fmt.Println(err)
 			if ctx.Sender != nil {
 				ctx.Respond(&messages.MsgAck{
