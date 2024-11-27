@@ -78,3 +78,10 @@ type MsgAuth struct {
 	Version int
 	Slot    int
 }
+
+type MsgGetUid struct {
+}
+
+type MsgUid struct {
+	UID string
+}

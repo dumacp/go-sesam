@@ -131,6 +131,12 @@ func (a *samActor) WaitState(ctx actor.Context) {
 		}(); err != nil {
 			logs.LogError.Println(err)
 		}
+	case *messages.MsgGetUid:
+		if ctx.Sender() != nil {
+			ctx.Respond(&messages.MsgUid{
+				UID: a.uid,
+			})
+		}
 	case *messages.MsgAuth:
 		if err := func() error {
 			if len(msg.Key) <= 0 {
