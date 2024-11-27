@@ -152,7 +152,7 @@ func (a *samActor) WaitState(ctx actor.Context) {
 			return nil
 		}(); err != nil {
 			fmt.Println(err)
-			if ctx.Sender != nil {
+			if ctx.Sender() != nil {
 				ctx.Respond(&messages.MsgAck{
 					Error: err.Error(),
 				})
