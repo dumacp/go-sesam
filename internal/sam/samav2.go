@@ -137,7 +137,7 @@ func (s *samAv2) GenerateKey(slot int, alg string) error {
 			return err
 		}
 		setConfig := samav2.SETConfigurationSettings(
-			false, false, samav2.AES_128,
+			false, false, samav2.AES_128, true,
 			false, false, false, false,
 			false, false, false, false)
 		extSetConfig := samav2.ExtSETConfigurationSettings(
@@ -188,7 +188,7 @@ func (s *samAv2) ImportKey(key []byte, slot int, alg string) error {
 			return errors.New("key len is invalid")
 		}
 		setConfig := samav2.SETConfigurationSettings(
-			false, false, samav2.AES_128,
+			false, false, samav2.AES_128, true,
 			false, false, false, false,
 			false, false, false, false)
 		extSetConfig := samav2.ExtSETConfigurationSettings(
@@ -284,7 +284,7 @@ func (s *samAv2) CreateEntryKey(alg string, slot, keyChangeID int, keys []byte) 
 		keys = append(keys, make([]byte, len(keys)%48)...)
 
 		setConfig := samav2.SETConfigurationSettings(
-			true, true, samav2.AES_128,
+			true, true, samav2.AES_128, true,
 			false, false, false, false,
 			false, false, false, false)
 		extSetConfig := samav2.ExtSETConfigurationSettings(
