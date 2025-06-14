@@ -157,6 +157,12 @@ func (a *samActor) WaitState(ctx actor.Context) {
 					Error: err.Error(),
 				})
 			}
+		} else {
+			if ctx.Sender() != nil {
+				ctx.Respond(&messages.MsgAck{
+					Error: "",
+				})
+			}
 		}
 	case *messages.MsgApdu:
 		if err := func() error {
